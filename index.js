@@ -2,7 +2,7 @@ require('dotenv').config()
 const { urlencoded } = require('express')
 const express = require('express')
 const app = express()
-
+app.use(express.json());
 const port = process.env.PORT || 5500
 
 app.use(urlencoded({extended:true}))
@@ -80,6 +80,41 @@ app.get('/authorized-users', async (req,res)=>{
     console.log(e)
     res.send("an error ocurred")
   }
+})
+
+//USERS ENDPOINT
+
+app.get('/users', async (req,res)=>{
+  try {
+    const allData = await client.query('select * from users')
+    const response = allData.rows 
+      res.send(response)
+      console.log("success")
+    }
+    catch (e) {
+      console.log(e)
+      res.send("an error ocurred")
+    }
+})
+
+app.post('/users/create', async (req,res)=>{
+
+  const {name,lastname,userrole,email} = req.body
+
+  const text = 'INSERT INTO users(name,lastname,userrole,useremail) VALUES($1, $2,$3,$4) RETURNING *'
+const values = [name,lastname,userrole,email]
+// callback
+client.query(text, values, (err, res) => {
+  if (err) {
+    console.log(err.stack)
+  } else {
+    console.log(res.rows[0])
+    // { name: 'brianc', email: 'brian.m.carlson@gmail.com' }
+  }
+})
+
+  console.log("req.body: ", req.body)
+  res.send('POST request to the homepage')
 })
 
 
