@@ -99,9 +99,8 @@ app.get('/users', async (req,res)=>{
 
 app.post('/users/create', async (req,res)=>{
 
-  const {name,lastname,userrole,email} = req.body
-
-  const text = 'INSERT INTO users(name,lastname,userrole,useremail) VALUES($1, $2,$3,$4) RETURNING *'
+const {name,lastname,userrole,email} = req.body
+const text = 'INSERT INTO users(name,lastname,userrole,useremail) VALUES($1, $2,$3,$4) RETURNING *'
 const values = [name,lastname,userrole,email]
 // callback
 client.query(text, values, (err, res) => {
@@ -109,14 +108,31 @@ client.query(text, values, (err, res) => {
     console.log(err.stack)
   } else {
     console.log(res.rows[0])
-    // { name: 'brianc', email: 'brian.m.carlson@gmail.com' }
   }
 })
 
-  console.log("req.body: ", req.body)
-  res.send('POST request to the homepage')
 })
 
+
+/* AUTHORIZED USERS */
+
+app.post('/authorizedusers/create', async (req,res)=>{
+
+  const {name,lastname,userrole,email} = req.body
+  const text = 'INSERT INTO users(name,lastname,userrole,useremail) VALUES($1,$2,$3,$4) RETURNING *'
+  const values = [name,lastname,userrole,email]
+  
+  client.query(text, values, (err, res) => {
+    if (err) {
+      console.log(err.stack)
+    } else {
+      console.log(res.rows[0])
+    }
+  })
+  
+  })
+
+/* PORT */
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
