@@ -1,7 +1,7 @@
 const db = require("../dbConnect");
 
 module.exports = {
-  get: async (req, res) => {
+  getUsers: async (req, res) => {
     try {
       const allData = await db.query("select * from users");
       const response = allData.rows;
@@ -27,7 +27,7 @@ module.exports = {
   delete: async (req, res) => {
     const { id } = req.body;
     const query = {
-      text: "DELETE from users where id=$1",
+      text: "DELETE from users where user_id=$1",
       values: [id],
     };
     // promise
@@ -47,13 +47,35 @@ module.exports = {
       })
       .catch((e) => console.error(e.stack));
   },
-  put: async (req, res) => {
+  updateLastLogin: async (req, res) => {
     const { datelastlogin, useremail } = req.body;
     try {
       const query = await {
         name: "update-last-login",
         text: `update users set datelastlogin=$1 where useremail=$2`,
         values: [datelastlogin, useremail],
+      };
+      db
+        .query(query)
+        .then((response) =>
+          res.json({
+            data: response.rowCount,
+            status: 200,
+          })
+        )
+        .catch((e) => res.send(e.stack));
+    } catch (error) {
+      res.json("an error ocurred");
+      console.log("error message:", error);
+    }
+  },
+  updateUser: async (req, res) => {
+    const { name,lastname,userrole,useremail} = req.body;
+    try {
+      const query = await {
+        name: "update-user",
+        text: `update users set name=$1,lastname=$2,userrole=$3,useremail=$4 where useremail=$5`,
+        values: [name,lastname,userrole,useremail,useremail],
       };
       db
         .query(query)

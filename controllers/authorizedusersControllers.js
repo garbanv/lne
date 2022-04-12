@@ -30,6 +30,30 @@ module.exports = {
           .then(data => res.status(200).json(data.rows[0]))
           .catch(e => console.error(e.stack))
     },
+    put: async (req, res) => {
+        console.log("put de authusers")
+        console.log("req.body",req.body)
+        const { name,lastname,role,email,isactive} = req.body;
+        try {
+          const query = await {
+            name: "update-last-login",
+            text: `update authorizedusers set name=$1, lastname=$2, role=$3, email=$4, isactive=$5 where email=$6`,
+            values: [name,lastname,role,email,isactive,email],
+          };
+          db
+            .query(query)
+            .then((response) =>
+              res.json({
+                data: response.rowCount,
+                status: 200,
+              })
+            )
+            .catch((e) => res.send(e.stack));
+        } catch (error) {
+          res.json("an error ocurred");
+          console.log("error message:", error);
+        }
+      },
     delete: async (req,res) =>{
         console.log("delete route")
         console.log("req.body:", req)
