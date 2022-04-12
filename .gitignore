@@ -5,3 +5,4 @@
 .env
 # local env files
 .env*.local
+testIndex.js

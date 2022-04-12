@@ -5,9 +5,15 @@ var cors = require('cors')
 const app = express()
 app.use(express.json());
 app.use(cors())
+app.use(urlencoded({extended:true}))
+var router = express.Router();
 const port = process.env.PORT || 5500
 
-app.use(urlencoded({extended:true}))
+/* controllers */
+const AuthorizedUsers = require('./controllers/authorizedusersControllers')
+
+const testRoute = require('./routes/test')
+app.use('/test', testRoute)
 
 
 const { Pool,Client } = require('pg')
@@ -72,17 +78,15 @@ result.forEach(row=> {
 res.json(users)
 }) */
 
-app.get('/authorized-users', async (req,res)=>{
-  try {
-  const allData = await client.query('select * from authorizedUsers')
-  const response = allData.rows 
-    res.send(response)
-  }
-  catch (e) {
-    console.log(e)
-    res.send("an error ocurred")
-  }
-})
+/* get all AUTHORIZED USERS */
+
+const authorizedUserRoute = require('./routes/authuser')
+app.use('/authorizedusers', authorizedUserRoute)
+
+
+
+
+
 
 //USERS ENDPOINT
 
@@ -126,9 +130,9 @@ app.put('/users/lastlogin', async(req,res)=>{
 app.post('/users/create', async (req,res)=>{
 
 
-const {name,lastname,userrole,email} = req.body
-const text = 'INSERT INTO users(name,lastname,userrole,useremail) VALUES($1, $2,$3,$4) RETURNING *'
-const values = [name,lastname,userrole,email]
+const {name,lastname,userrole,email,dateaccountactivated} = req.body
+const text = 'INSERT INTO users(name,lastname,userrole,useremail,dateaccountactivated) VALUES($1, $2,$3,$4,$5) RETURNING *'
+const values = [name,lastname,userrole,email,dateaccountactivated]
 // callback
 client.query(text, values, (err, res) => {
   if (err) {
@@ -143,59 +147,11 @@ client.query(text, values, (err, res) => {
 
 
 
-/* AUTHORIZED USERS */
 
-app.get('/authorizedusers', async (req,res)=>{
-  try {
-    const allData = await client.query('select * from authorizedusers')
-    const response = allData.rows 
-      res.send(response)
-      console.log("success")
-    }
-    catch (e) {
-      console.log(e)
-      res.send("an error ocurred")
-    }
-})
 
-/* app.post('/authorizedusers/create', async (req,res)=>{
-  const {name,lastname,role,email} = req.body
-  const text = 'INSERT INTO authorizedusers (name,lastname,role,email) VALUES($1,$2,$3,$4) RETURNING *'
-  const values = [name,lastname,role,email]
+
+
   
-  const result = await client.query(text, values, (err, res) => {
-    if (err) {
-      console.log(err.stack)
-    } else {
-    
-      return  res.rows[0]
-      
-    }
-  })
-  
-res.status(200)
-
-  }) */
-
-
-  app.post('/authorizedusers/create', async (req,res)=>{
-    let {name,lastname,role,email,isactive} = req.body
-    if(isactive===true){
-      isactive=1
-    } else {
-      isactive=0
-    }
-    const dateaccountactivated = new Date()
-    const query = {
-      text: 'INSERT INTO authorizedusers (name,lastname,role,email,isactive,dateaccountactivated) VALUES($1,$2,$3,$4,$5,$6) RETURNING *',
-      values: [name,lastname,role,email,isactive,dateaccountactivated],
-    }
-    // promise
-    client
-      .query(query)
-      .then(data => res.status(200).json(data.rows[0]))
-      .catch(e => console.error(e.stack))
-    })
 
 
 /* PORT */
