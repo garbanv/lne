@@ -16,7 +16,7 @@ module.exports = {
       "INSERT INTO users(name,lastname,userrole,useremail,dateaccountactivated) VALUES($1, $2,$3,$4,$5) RETURNING *";
     const values = [name, lastname, userrole, email, dateaccountactivated];
     // callback
-    client.query(text, values, (err, res) => {
+    db.query(text, values, (err, res) => {
       if (err) {
         console.log(err.stack);
       } else {
@@ -55,7 +55,7 @@ module.exports = {
         text: `update users set datelastlogin=$1 where useremail=$2`,
         values: [datelastlogin, useremail],
       };
-      client
+      db
         .query(query)
         .then((response) =>
           res.json({
