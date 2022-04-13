@@ -33,10 +33,10 @@ module.exports = {
     put: async (req, res) => {
         console.log("put de authusers")
         console.log("req.body",req.body)
-        const { name,lastname,role,email,isactive} = req.body;
+        const {name,lastname,role,email,isactive} = req.body;
         try {
           const query = await {
-            name: "update-last-login",
+            name: "update-user",
             text: `update authorizedusers set name=$1, lastname=$2, role=$3, email=$4, isactive=$5 where email=$6`,
             values: [name,lastname,role,email,isactive,email],
           };
